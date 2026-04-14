@@ -21,6 +21,7 @@ class PQEntry implements Comparable<PQEntry> {
     /** the edge to be considered for addition to the collection
 	of shortest paths */
     protected HighwayEdge lastEdge;
+	protected int priority;
 
     /**
      * Construct a PQEntry
@@ -29,10 +30,11 @@ class PQEntry implements Comparable<PQEntry> {
      * @param lastEdge the candidate edge for inclusion in the collection of
      *        shortest paths
      */
-    public PQEntry(double totalDist, HighwayEdge lastEdge) {
+    public PQEntry(double totalDist, HighwayEdge lastEdge, int priority) {
 
 	this.totalDist = totalDist;
 	this.lastEdge = lastEdge;
+	this.priority = priority;
     }
 
     /**
@@ -49,8 +51,8 @@ class PQEntry implements Comparable<PQEntry> {
     @Override
     public int compareTo(PQEntry other) {
 
-	if (totalDist < other.totalDist) return -1;
-	if (totalDist > other.totalDist) return 1;
+	if (priority < other.priority) return -1;
+	if (priority > other.priority) return 1;
 	return 0;
     }
 }
@@ -135,11 +137,13 @@ public class Dijkstra {
 	// initialize PQ with the places we can get to directly from
 	// the start vertex
 	HighwayEdge e = start.head;
+	int priority = 0;
 	while (e != null) {
 	    if (DEBUG) {
 		System.out.println("pq.add(" + e.length + ", edge to " + g.vertices[e.dest].label + " via " + e.label + ")");
 	    }
-	    pq.add(new PQEntry(e.length, e));
+	    pq.add(new PQEntry(e.length, e, (int)(Math.random() * g.numEdges)));
+		priority--;
 	    e = e.next;
 	}
 
@@ -182,7 +186,8 @@ public class Dijkstra {
 			if (DEBUG) {
 			    System.out.println("pq.add(" + (nextPQ.totalDist + e.length) + ", edge to " + g.vertices[e.dest].label + " via " + e.label + ")");
 			}
-			pq.add(new PQEntry(nextPQ.totalDist + e.length, e));
+			pq.add(new PQEntry(nextPQ.totalDist + e.length, e, (int)(Math.random() * g.numEdges)));
+			priority--;
 		    }
 		    e = e.next;
 		}
